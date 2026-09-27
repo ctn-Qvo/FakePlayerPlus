@@ -2,11 +2,13 @@
 
 <img align="right" src="https://github.com/user-attachments/assets/1ce21dfc-fd0c-4e6c-b006-ee3844adb274" border="0" alt="" />
 
-# FakePlayerPlus ![](https://img.shields.io/badge/Paper-1.21.11_--_26.3-2B7FFF?logo=telegram&logoColor=3884F7) ![](https://img.shields.io/badge/Folia-1.21.11_--_26.2-C33CCA?logo=leaflet&logoColor=C33CCA)
+# FakePlayerPlus ![](https://img.shields.io/badge/Paper-1.21.11_--_26.3-2B7FFF?logo=telegram&logoColor=3884F7) ![](https://img.shields.io/badge/Folia-1.21.11_--_26.2-C33CCA?logo=leaflet&logoColor=C33CCA) ![](https://img.shields.io/github/stars/xiplugin/FakePlayerPlus)
 
 這個插件模擬了真實玩家，對伺服器而言，此插件生成的假人就是一個真正的「活人」。
 
 > 本插件的靈感源自 [minecraft-fakeplayer](https://github.com/tanyaofei/minecraft-fakeplayer) 插件，隨著 Minecraft 版本的快速迭代，原版插件的架構在修復和維護上略顯吃力，故基於 Kotlin 對其進行了完全的底層重構。本插件在繼承原版插件核心特性的同時，實現了專案架構的高度解耦，使其成為更現代化、更健壯的衍生加強版。
+
+⭐ 如果你喜歡 FakePlayerPlus，給它點個Star吧！這對項目的成長非常有幫助。
 
 ## 遷移
 
@@ -20,16 +22,19 @@
 
 - [x] **等同真實玩家**
 - [x] **保持區塊載入**：召喚假人幫你保持區塊載入、怪物生成
-- [x] **背包存放物品**：可以使用假人的背包來存放物品。
 - [x] **行為動作控制**：支援控制假人執行攻擊、挖掘、跳躍、釣魚等動作，並支援週期性循環。
-- [x] **開發者 API**🚀：已將基本功能抽象成 api 套件，可供插件開發者調用
-- [x] **語言檔案**🚀：可自訂語言檔案，並支援熱重載（包含繁體中文 `zh_TW`、簡體中文 `zh_CN`、英文 `en`）
-- [x] **動態調整假人數量**🚀：伺服器 TPS 過低時可踢出假人並降低召喚數量限制
-- [x] **假人設定 GUI**🚀：可透過 Dialog 介面快速開關實體碰撞、無敵模式、自動補貨等功能。
-- [x] **假人動作 GUI**🚀：可透過 Dialog 介面快速執行假人動作
-- [x] **假人聊天功能**🚀：可透過 /fp chat 讓假人發送聊天訊息
-- [x] **假人 PING 設定**🚀：可設定假人 ping 值，也可模擬 ping 抖動偽裝活人
-- [x] **多人管理**🚀：玩家可以互相分享假人使用權
+- [x] **開發者 API**：已將基本功能抽象成 api 套件，可供插件開發者調用([文檔]((./CONTRIBUTING.zh-TW.md#%E9%96%8B%E7%99%BC%E9%99%84%E5%B1%AC%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8-api)))
+- [x] **語言檔案**：可自訂語言檔案，並支援熱重載（包含繁體中文 `zh_TW`、簡體中文 `zh_CN`、英文 `en`）
+- [x] **動態調整假人數量**：伺服器 TPS 過低時可踢出假人並降低召喚數量限制
+- [x] **假人設定 GUI**：可透過 Dialog 介面快速開關實體碰撞、無敵模式、自動補貨等功能。
+  - <img width="500" height="460" alt="703a14563e2ec7039797a9fc790addf2" src="https://github.com/user-attachments/assets/9e3bc8ab-cf0e-4814-98b0-6309ee0b40d6" />
+- [x] **假人動作 GUI**：可透過 Dialog 介面快速執行假人動作
+  - <img width="500" height="460" alt="191dc24a233ed0c5447064c2b0de58b1" src="https://github.com/user-attachments/assets/3f049f26-cfa3-4084-b478-7b0ec5542db2" />
+- [x] **背包存放物品**：可以使用假人的背包來存放物品和管理裝備欄。
+  - <img width="500" height="460" alt="5fdfe03ddaa68fee13558577d6564e90" src="https://github.com/user-attachments/assets/00b3fb3e-2a2f-4782-8419-51c0314bd83b" />
+- [x] **假人聊天功能**：可透過 /fp chat 讓假人發送聊天訊息
+- [x] **假人 PING 設定**：可設定假人 ping 值，也可模擬 ping 抖動偽裝活人
+- [x] **多人管理**：玩家可以互相分享假人使用權
 
 ## 設定
 
@@ -67,12 +72,6 @@
 | **/fp owner add** | 將玩家新增為假人的擁有者 | fakeplayer.owner.add | |
 | /fp owner remove | 移除玩家的擁有者權限 | fakeplayer.owner.remove | |
 | /fp reload | 重載設定 | fakeplayer.reload | |
-
-## 假人獨立設定 / 動作
-
-請參考 `/fp settings` 和 `/fp action` 指令
-
-![假人UI界面](https://github.com/user-attachments/assets/edf2dce7-009a-4b7c-827f-2b10bc432137)
 
 ## PlaceholderAPI
 

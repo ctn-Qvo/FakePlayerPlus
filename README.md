@@ -2,9 +2,11 @@
 
 <img align="right" src="https://github.com/user-attachments/assets/1ce21dfc-fd0c-4e6c-b006-ee3844adb274" border="0" alt="" />
 
-# FakePlayerPlus ![](https://img.shields.io/badge/Paper-1.21.11_--_26.3-2B7FFF?logo=telegram&logoColor=3884F7) ![](https://img.shields.io/badge/Folia-1.21.11_--_26.2-C33CCA?logo=leaflet&logoColor=C33CCA)
+# FakePlayerPlus ![](https://img.shields.io/badge/Paper-1.21.11_--_26.3-2B7FFF?logo=telegram&logoColor=3884F7) ![](https://img.shields.io/badge/Folia-1.21.11_--_26.2-C33CCA?logo=leaflet&logoColor=C33CCA) ![](https://img.shields.io/github/stars/xiplugin/FakePlayerPlus)
 
 This plugin generates fake players that act as real ones. To the server, they are fully recognized as real, living players.
+
+⭐ If you like FakePlayerPlus, consider giving it a Star! It really helps the project grow. 
 
 > This plugin is inspired by [minecraft-fakeplayer](https://github.com/tanyaofei/minecraft-fakeplayer) plugin. With the rapid iteration of Minecraft versions, the original plugin's architecture is slightly struggling in patching and maintenance, so it was completely refactored from the ground up based on Kotlin. While inheriting the core features of the original plugin, this plugin achieves a high degree of decoupling in project architecture, making it a more modern, robust, and enhanced derivative version.
 
@@ -19,16 +21,19 @@ This plugin generates fake players that act as real ones. To the server, they ar
 
 - [x] **Identical to Real Players**
 - [x] **Keep Chunks Loaded**: Summon fake players to help you keep chunks loaded and mobs refreshing
-- [x] **Inventory Storage**: You can use the fake player's inventory to store items.
 - [x] **Behavior & Action Control**: Supports controlling fake players to perform actions such as attacking, mining, jumping, fishing, etc., and supports periodic loops.
-- [x] **Developer API**🚀: Core features have been abstracted into an api package, available for plugin developers to invoke
-- [x] **Language Files** 🚀: Custom language files supported with hot-reload
-- [x] **Dynamic Count Adjustment** 🚀: When the server TPS is too low, it can kick fake players and lower the summon limit
-- [x] **Settings GUI** 🚀: Quickly toggle entity collision, invincibility mode, auto-restock, and other features via Dialog interface.
-- [x] **Action GUI** 🚀: Easily execute fake player actions via Dialog interface
-- [x] **Chat Feature** 🚀: Make fake players send chat messages using /fp chat
-- [x] **Latency (PING) Settings** 🚀: Configure fake player ping values, or simulate ping jitter to camouflage real players
-- [x] **Multi-user Management** 🚀: Players can share fake player control rights with each other
+- [x] **Developer API**: Core features have been abstracted into an api package, available for plugin developers to invoke ([DOC](./CONTRIBUTING.md#developing-add-on-plugins-using-the-api))
+- [x] **Language Files** : Custom language files supported with hot-reload
+- [x] **Dynamic Count Adjustment** : When the server TPS is too low, it can kick fake players and lower the summon limit
+- [x] **Settings GUI** : Quickly toggle entity collision, invincibility mode, auto-restock, and other features via Dialog interface.
+  - <img width="500" height="460" alt="45f58e80ca27bb83ebc32172da05f45f" src="https://github.com/user-attachments/assets/c80c6c39-7792-4f08-9d7c-9dce951f58c4" />
+- [x] **Action GUI** : Easily execute fake player actions via Dialog interface
+  - <img width="500" height="460" alt="b9cd8cf028fe437f47c9fcfac113bcd5" src="https://github.com/user-attachments/assets/5c36096f-6888-4638-98d9-098ee86212f5" />
+- [x] **Inventory Storage**: You can use the fake player's inventory to store items.
+  - <img width="500" height="460" alt="8ca36e1b6201ae9f4f417c8130ea615f" src="https://github.com/user-attachments/assets/3054f204-bd5e-41f4-a10e-eb384a080b4f" />
+- [x] **Chat Feature** : Make fake players send chat messages using /fp chat
+- [x] **Latency (PING) Settings** : Configure fake player ping values, or simulate ping jitter to camouflage real players
+- [x] **Multi-user Management** : Players can share fake player control rights with each other
 
 ## Configuration
 
@@ -66,12 +71,6 @@ Please refer to the `config.yml` configuration file in the plugin directory
 | **/fp owner add** | Add a player as an owner of the fake player | fakeplayer.owner.add | |
 | /fp owner remove | Revoke a player's owner permissions | fakeplayer.owner.remove | |
 | /fp reload | Reload configuration | fakeplayer.reload | |
-
-## Fake Player Independent Settings / Actions
-
-Please refer to the `/fp settings` and `/fp action` commands.
-
-![FakePlayer UI](https://github.com/user-attachments/assets/a60189fa-3416-4164-9854-16dedb05b721)
 
 ## PlaceholderAPI
 
