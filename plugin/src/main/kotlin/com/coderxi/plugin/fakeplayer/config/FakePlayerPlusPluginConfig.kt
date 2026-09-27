@@ -99,9 +99,7 @@ class FakePlayerPlusPluginConfig : OkaeriConfig() {
     @Comment("Force override fake player settings. If you want all fake players on the server to use a specific setting and prevent it from being modified, configure it here.")
     @CustomKey("override-settings")
     var overrideSettings = mapOf(
-        "deathAction" to DeathAction.QUIT.name,
-        "followQuiting" to true,
-        "followQuitingDelay" to 10
+        "deathAction" to DeathAction.QUIT.name
     )
 
     @Comment(
