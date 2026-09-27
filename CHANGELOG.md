@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/xiplugin/FakePlayerPlus/compare/v2.1.0...v2.1.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* allow auto-replenish when both hands hold items for tree farms ([ceb46d6](https://github.com/xiplugin/FakePlayerPlus/commit/ceb46d69adad5e00261680b09a0952c2c7a595c8))
+
 ## [2.1.0](https://github.com/xiplugin/FakePlayerPlus/compare/v2.0.0...v2.1.0) (2026-09-27)
 
 
