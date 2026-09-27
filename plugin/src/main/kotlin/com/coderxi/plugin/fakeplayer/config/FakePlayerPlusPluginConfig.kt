@@ -1,5 +1,6 @@
 package com.coderxi.plugin.fakeplayer.config
 
+import com.coderxi.plugin.fakeplayer.api.entity.FakePlayerSettings.DeathAction
 import com.coderxi.plugin.fakeplayer.provider.invsee.AdvancedInvseeProvider
 import com.coderxi.plugin.fakeplayer.provider.invsee.InvseeProvider
 import com.coderxi.plugin.fakeplayer.provider.invsee.OpenInvInvseeProvider
@@ -94,6 +95,13 @@ class FakePlayerPlusPluginConfig : OkaeriConfig() {
     @CustomKey("default-settings")
     var defaultSettings = FakePlayerSettingsConfig()
 
+    @Comment("强制覆盖假人的设置，如果你希望服务器假人统一应用某个选项并不可修改，可以在这里设置")
+    @Comment("Force override fake player settings. If you want all fake players on the server to use a specific setting and prevent it from being modified, configure it here.")
+    @CustomKey("override-settings")
+    var overrideSettings = mapOf(
+        "deathAction" to DeathAction.QUIT.name
+    )
+
     @Comment(
         "假人生命周期指令绑定",
         "(无前缀)假人自身执行 变量 {uuid} {name} {spawner_uuid} {spawner_name}",
@@ -117,10 +125,11 @@ class FakePlayerPlusPluginConfig : OkaeriConfig() {
             "[CONSOLE] /lp user {uuid} parent set bot"
         )
 
-        @Comment("假人已建立网络连接并注册到了假人列表 (尚未进入世界)")
-        @Comment("FakePlayer connected and registered to the player list (not in world yet)")
+        @Comment("假人已建立网络连接并注册到了假人列表 (尚未进入世界) 此阶段可以添加/register和/login方法进行认证")
+        @Comment("FakePlayer connected and registered to the player list (not in world yet), At this stage, /register and /login commands can be added for authentication.")
+        @Comment("e.g: /register sjkJFln1il sjkJFln1il , /login sjkJFln1il")
         var connected: List<String> = arrayListOf(
-            "/login FAKEPLAYER111"
+            ""
         )
 
         @Comment("假人已进入世界")
@@ -178,6 +187,11 @@ class FakePlayerPlusPluginConfig : OkaeriConfig() {
         @Comment("Ping jitter interval (in seconds)")
         @CustomKey("ping-jitter-interval")
         var pingJitterInterval = 3
+
+        @Comment("自动注册与登录(使用随机密码) 目前只支持AuthMe系列插件，其他系列登录插件请使用lifecycle-commands.connected添加/login和/register的方式进行验证")
+        @Comment("Automatically register and login (using a random password). Currently only supports AuthMe-based plugins. For other login plugins, use lifecycle-commands.connected to add /register and /login commands for authentication.")
+        @CustomKey("auto-auth")
+        var autoAuth = true
 
     }
 

@@ -11,6 +11,7 @@ interface FakePlayerSettings {
     var simulationDistance: Int
     var xpNoCooldown: Boolean
     var autoEquipTool: Boolean
+    var keepInventory: Boolean
     var interactedAction: InteractedAction
     var shiftInteractedAction: InteractedAction
     enum class InteractedAction {
@@ -26,9 +27,12 @@ interface FakePlayerSettings {
         RESPAWN,
         RESPAWN_BACK
     }
-    var keepInventory: Boolean
-    var followQuiting: Boolean
-    var followQuitingDelay: Int
+    var keepingMode: KeepingMode
+    enum class KeepingMode {
+        ALWAYS,
+        FOLLOW_SPAWNER,
+        FOLLOW_SPAWNER_QUIT
+    }
 
     fun sync(that: FakePlayerSettings) {
         that.collidable = collidable
@@ -40,12 +44,11 @@ interface FakePlayerSettings {
         that.simulationDistance = simulationDistance
         that.xpNoCooldown = xpNoCooldown
         that.autoEquipTool = autoEquipTool
+        that.keepInventory = keepInventory
         that.interactedAction = interactedAction
         that.shiftInteractedAction = shiftInteractedAction
         that.deathAction = deathAction
-        that.keepInventory = keepInventory
-        that.followQuiting = followQuiting
-        that.followQuitingDelay = followQuitingDelay
+        that.keepingMode = keepingMode
     }
 
     fun bind(fakePlayer: FakePlayer){

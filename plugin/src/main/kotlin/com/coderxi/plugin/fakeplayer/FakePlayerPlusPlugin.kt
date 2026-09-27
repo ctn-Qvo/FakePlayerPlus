@@ -20,6 +20,7 @@ import com.coderxi.plugin.fakeplayer.api.manager.FakePlayerManager
 import com.coderxi.plugin.fakeplayer.command.annotaion.*
 import com.coderxi.plugin.fakeplayer.command.parameter.*
 import com.coderxi.plugin.fakeplayer.command.permission.Permission
+import com.coderxi.plugin.fakeplayer.entity.StandardFakePlayerSettings
 import com.coderxi.plugin.fakeplayer.expansion.FakePlayerPlaceholderExpansion
 import com.coderxi.plugin.fakeplayer.manager.FakePlayerManagerImpl
 import com.coderxi.plugin.fakeplayer.provider.invsee.InvseeProvider
@@ -77,8 +78,10 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
             //config
             FakePlayerLimiter,
             FakePlayerPingUpdater(),
+            StandardFakePlayerSettings.Companion,
             FakePlayerLifecycleCommandListener(),
             InvseeProvider.Companion,
+            FakePlayerAutoAuthListener(),
             //settings
             FakePlayerDummyVarsNotifyListener(),
             FakePlayerAutoReplenishListener(),
@@ -86,7 +89,7 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
             FakePlayerAutoEquipToolListener(),
             FakePlayerInteractedListener(),
             FakePlayerDeathListener(),
-            FakePlayerFollowQuittingListener(),
+            FakePlayerKeepingModeListener(),
             //other
             StaticFakePlayerManager()
         )
@@ -137,7 +140,7 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
         val initSql = classLoader.getResourceAsStream("database/init.sql")!!.readAllBytes().toString(Charsets.UTF_8)
         val sqlList = initSql.split(";").map { it.trim() }.filter { it.isNotBlank() }
         @Suppress("SqlSourceToSinkFlow")
-        sqlList.forEach { sql2o.open().createQuery(it).executeUpdate() }
+        sqlList.forEach { runCatching { sql2o.open().createQuery(it).executeUpdate() } }
         return sql2o
     }
 

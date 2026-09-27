@@ -45,6 +45,10 @@ class FakePlayerSettingsConfig : FakePlayerSettings, OkaeriConfig() {
         @Comment("Whether to automatically equip the best tool")
         override var autoEquipTool: Boolean = false
 
+        @Comment("死亡不掉落")
+        @Comment("Keep inventory")
+        override var keepInventory = true
+
         @Comment("=======================================================")
         @Comment("下列设置默认不包含在[fakeplayer.basic]权限中, 允许玩家修改需给予权限[fakeplayer.settings.变量名]")
         @Comment("These settings are not included in the [fakeplayer.basic] permission by default. Players must be granted the fakeplayer.settings.<settingName> permission to modify them.")
@@ -65,16 +69,9 @@ class FakePlayerSettingsConfig : FakePlayerSettings, OkaeriConfig() {
         @Comment("NONE, QUIT, RESPAWN, RESPAWN_BACK")
         override var deathAction = DeathAction.RESPAWN_BACK
 
-        @Comment("死亡不掉落")
-        @Comment("Keep inventory")
-        override var keepInventory = true
-
-        @Comment("跟随玩家退出")
-        @Comment("Follow player to quit")
-        override var followQuiting = true
-
-        @Comment("延迟x秒再跟随退出(若在x秒内重新上线则假人不会退出)")
-        @Comment("Delay x seconds before following to quit (If player logs back in within x seconds, the fake player will not be removed)")
-        override var followQuitingDelay = 30
+        @Comment("驻留模式")
+        @Comment("How the fake player remains present")
+        @Comment("ALWAYS, FOLLOW_SPAWNER, FOLLOW_SPAWNER_QUIT")
+        override var keepingMode = KeepingMode.FOLLOW_SPAWNER_QUIT
 
     }
