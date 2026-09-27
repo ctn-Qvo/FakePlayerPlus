@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.0](https://github.com/xiplugin/FakePlayerPlus/compare/v2.0.0...v2.1.0) (2026-09-27)
+
+
+### Features
+
+* add automatic registration and login support for AuthMe ([822d79f](https://github.com/xiplugin/FakePlayerPlus/commit/822d79f7df759e1d7b923c252559a4e3b4dbbd1a))
+* add keepInventory setting to fakeplayer.basic permission ([bb58957](https://github.com/xiplugin/FakePlayerPlus/commit/bb58957fcff09110f9ae6dc4cbf5836bd3780c9f))
+* add override-settings config to enforce server-wide fakeplayer settings ([854db4c](https://github.com/xiplugin/FakePlayerPlus/commit/854db4c0d717450740d9520b3b4cca0582aa8981))
+* persist fake player action states, consolidate followQuitting into keepingMode, and add always mode ([fc475a6](https://github.com/xiplugin/FakePlayerPlus/commit/fc475a627c6a8506774b351287cd7c7e0c47fdb3))
+
 ## [2.0.0](https://github.com/xiplugin/FakePlayerPlus/compare/v1.10.1...v2.0.0) (2026-09-25)
 
 
