@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.1.2](https://github.com/xiplugin/FakePlayerPlus/compare/v2.1.1...v2.1.2) (2026-09-28)
+
+
+### Bug Fixes
+
+* prevent other plugins from modifying fake player spawn location ([7546fea](https://github.com/xiplugin/FakePlayerPlus/commit/7546fea1da3469101df0e49e7ecdb17f0100e670))
+* run auto-auth synchronously to prevent login session errors with FastLogin and other plugins ([95ff671](https://github.com/xiplugin/FakePlayerPlus/commit/95ff67190202bcde0381a0f655f1215633feeb72))
+* unregister permissions on plugin disable to support hot reload ([32d3ed0](https://github.com/xiplugin/FakePlayerPlus/commit/32d3ed0d2afc530cce2527e7db1e884bc84ab14d))
+
 ## [2.1.1](https://github.com/xiplugin/FakePlayerPlus/compare/v2.1.0...v2.1.1) (2026-09-27)
 
 
