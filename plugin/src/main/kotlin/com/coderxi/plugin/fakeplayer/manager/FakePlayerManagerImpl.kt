@@ -33,6 +33,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerKickEvent
+import org.bukkit.event.player.PlayerTeleportEvent
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -63,7 +64,7 @@ class FakePlayerManagerImpl : FakePlayerManager, PluginComponent, Listener {
 
     private fun uuid(name: String) = UUID.nameUUIDFromBytes("${plugin.name}:$name".toByteArray())
 
-    private val pendingSpawn = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.SECONDS).build<UUID, Boolean>()
+    private val pendingSpawn = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.SECONDS).build<UUID, Location>()
 
     override suspend fun spawn(name: String, spawner: CommandSender, location: Location?) : FakePlayer {
         val spawnerUuid = spawner.uniqueIdOrZero
@@ -73,10 +74,10 @@ class FakePlayerManagerImpl : FakePlayerManager, PluginComponent, Listener {
         } ?: StandardFakePlayer(name, uuid(name), spawnerUuid, mutableSetOf(spawnerUuid),null, FakePlayerSettingsPO().toEntity()).also {
             withContext(Dispatchers.IO) { repository.save(it, true) }
         }
-        if (pendingSpawn.getIfPresent(fakePlayer.uuid) == true) {
+        if (pendingSpawn.getIfPresent(fakePlayer.uuid) != null) {
             throw SpawnDuplicateSpawningException(fakePlayer.name)
         }
-        pendingSpawn.put(fakePlayer.uuid,true)
+        pendingSpawn.put(fakePlayer.uuid, spawnLocation)
         val address = IPGenerator.next()
         AsyncPlayerPreLoginEvent(name,address, fakePlayer.uuid, false).let { event ->
             event.callEvent()
@@ -207,6 +208,14 @@ class FakePlayerManagerImpl : FakePlayerManager, PluginComponent, Listener {
             number++
         }
         throw SpawnNoAvailableSequenceNameException()
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun preventTeleportOnSpawning(event: PlayerTeleportEvent) {
+        val spawnLocation = pendingSpawn.getIfPresent(event.player.uniqueId) ?: return
+        if (event.to != spawnLocation) {
+            event.isCancelled = true
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
