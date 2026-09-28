@@ -163,6 +163,7 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
     }
 
     override fun onDisable() {
+        server.pluginManager.removePermission(Permission.BASIC)
         globalCoroutineScope.cancel()
         HandlerList.unregisterAll(this)
         components.forEach(PluginComponent0::onDisable)
