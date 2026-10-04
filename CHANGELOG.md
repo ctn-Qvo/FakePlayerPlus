@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.3](https://github.com/xiplugin/FakePlayerPlus/compare/v2.1.2...v2.1.3) (2026-10-04)
+
+
+### Bug Fixes
+
+* kick fake players on plugin disable to prevent them from remaining online after hot reload ([db674e9](https://github.com/xiplugin/FakePlayerPlus/commit/db674e917de555aaad0682eada8312f21adf19fc))
+* prevent item duplication when viewing a kicked fakeplayer's inventory in ADVANCED invsee ([cc3f909](https://github.com/xiplugin/FakePlayerPlus/commit/cc3f9094d4f6d225e501df1984683adcfe066b9d))
+
 ## [2.1.2](https://github.com/xiplugin/FakePlayerPlus/compare/v2.1.1...v2.1.2) (2026-09-28)
 
 
