@@ -24,6 +24,7 @@ import com.coderxi.plugin.fakeplayer.entity.StandardFakePlayerSettings
 import com.coderxi.plugin.fakeplayer.expansion.FakePlayerPlaceholderExpansion
 import com.coderxi.plugin.fakeplayer.manager.FakePlayerManagerImpl
 import com.coderxi.plugin.fakeplayer.provider.invsee.InvseeProvider
+import com.coderxi.plugin.fakeplayer.utils.bukkit.UUID_ZERO
 import com.coderxi.plugin.fakeplayer.utils.plugin.NMSBridgeLoader
 import com.coderxi.plugin.fakeplayer.utils.common.RegexTransformer
 import com.coderxi.plugin.fakeplayer.utils.coroutine.globalCoroutineScope
@@ -163,6 +164,7 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
     }
 
     override fun onDisable() {
+        fakePlayerManager.fakeplayers().forEach { if (it.spawner.uuid!= UUID_ZERO) it.quit("Plugin disable") }
         server.pluginManager.removePermission(Permission.BASIC)
         globalCoroutineScope.cancel()
         HandlerList.unregisterAll(this)
