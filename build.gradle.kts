@@ -12,9 +12,11 @@ subprojects {
     group = rootProject.group
     version = rootProject.version
     repositories {
-        mavenCentral()
+        // PaperMC 放最前,优先解析 paper 相关依赖
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://repo.luckperms.net/")
+        mavenCentral()
+        // LuckPerms 仓库(正确地址)
+        maven("https://repo.lucko.me/")
     }
     configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
         jvmToolchain(25)
