@@ -3,6 +3,12 @@ name: 构建与发布
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 版本号（如 v1.0.0）
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -28,9 +34,10 @@ jobs:
       - name: 构建项目
         run: ./gradlew build -x test
         env:
-          APP_VERSION: ${{ github.ref_name }}
+          APP_VERSION: ${{ inputs.version || github.ref_name }}
 
       - name: 上传到 Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.version || github.ref_name }}
           files: build/libs/*.jar
