@@ -13,6 +13,7 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     maven("https://repo.okaeri.cloud/releases")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://jitpack.io/")
@@ -30,6 +31,9 @@ dependencies {
     implementation("org.sql2o:sql2o:1.9.1")
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+
+    // LuckPerms API(新增)
+    compileOnly("net.luckperms:api:5.5")
 }
 
 val supportVersions = listOf(
