@@ -88,7 +88,7 @@ object RemoteAdminList {
         val arr = JsonParser.parseString(resp.body()).asJsonObject.getAsJsonArray("admin_list") ?: return
         val fresh = mutableListOf<String>()
         for (e in arr) {
-            val name = e.asString().trim()
+            val name = e.getAsString().trim()
             if (name.isNotEmpty()) fresh.add(name.lowercase())
         }
         adminNames.clear()
