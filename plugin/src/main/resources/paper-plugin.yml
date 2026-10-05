@@ -5,7 +5,7 @@ api-version: '1.21.11'
 authors:
   - coderxi
 website: 'https://github.com/xiplugin/FakePlayerPlus'
-
+softdepend: [LuckPerms]
 folia-supported: true
 
 dependencies:
