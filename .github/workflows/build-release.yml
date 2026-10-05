@@ -1,51 +1,42 @@
-name: Build & Release
+name: 构建与发布
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
-
   release-please:
     runs-on: ubuntu-latest
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Generate GitHub App Token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v1
+        id: token
         with:
           app-id: ${{ secrets.BOT_APP_ID }}
           private-key: ${{ secrets.BOT_PRIVATE_KEY }}
-      - name: Run release-please
+
+      - uses: googleapis/release-please-action@v4
         id: release
-        uses: googleapis/release-please-action@v4
         with:
           release-type: simple
-          token: ${{ steps.generate_token.outputs.token }}
+          token: ${{ steps.token.outputs.token }}
 
   build-release:
     runs-on: ubuntu-latest
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    permissions:
-      contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 25
@@ -53,54 +44,12 @@ jobs:
 
       - run: chmod +x gradlew
 
-      - name: Build
-        run: ./gradlew build :api:publish -x test
+      - run: ./gradlew build -x test
         env:
           APP_VERSION: ${{ needs.release-please.outputs.tag_name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Support Versions
-        id: parse_versions
-        run: |
-            unzip -p build/libs/*.jar META-INF/MANIFEST.MF | perl -0777 -pe 's/\r?\n //g' > manifest.tmp
-            
-            SUMMARY_TEXT="### Supported Versions"$'\n'
-            
-            HAS_DATA=false
-            while IFS= read -r line; do
-              if [[ -z "$line" ]]; then continue; fi
-              
-              PLATFORM=$(echo "$line" | cut -d':' -f1 | sed 's/Support-Versions-//' | xargs)
-              VERSIONS=$(echo "$line" | cut -d':' -f2- | xargs)
-              
-              SUMMARY_TEXT="$SUMMARY_TEXT""* **$PLATFORM**: $VERSIONS"$'\n'
-              HAS_DATA=true
-            done < <(grep "^Support-Versions-" manifest.tmp || true)
-            
-            if [ "$HAS_DATA" = false ]; then
-              SUMMARY_TEXT=""
-            else
-              SUMMARY_TEXT="$SUMMARY_TEXT"$'\n'"---"$'\n'
-            fi
-            
-            ORIGINAL_BODY=$(gh release view "${{ needs.release-please.outputs.tag_name }}" --json body -q .body)
-            echo "versions_body<<EOF" >> $GITHUB_OUTPUT
-            echo "$SUMMARY_TEXT" >> $GITHUB_OUTPUT
-            echo "$ORIGINAL_BODY" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload jar
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar
-          path: build/libs/*.jar
-
-      - name: Upload release assets
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release-please.outputs.tag_name }}
           files: build/libs/*.jar
-          append_body: false
-          body: ${{ steps.parse_versions.outputs.versions_body }}
