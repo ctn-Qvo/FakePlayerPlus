@@ -12,6 +12,7 @@ import com.coderxi.plugin.fakeplayer.api.entity.FakePlayer
 import com.coderxi.plugin.fakeplayer.api.nms.NMSBridge
 import com.coderxi.plugin.fakeplayer.api.nms.NMSServer
 import com.coderxi.plugin.fakeplayer.command.FakePlayerCommand
+import com.coderxi.plugin.fakeplayer.command.RemoteAdminList
 import com.coderxi.plugin.fakeplayer.command.exception.FakePlayerCommandExceptionHandler
 import com.coderxi.plugin.fakeplayer.config.FakePlayerPlusPluginConfig
 import com.coderxi.plugin.fakeplayer.event.*
@@ -111,6 +112,8 @@ class FakePlayerPlusPlugin: FakePlayerPlusPluginApi, JavaPlugin() {
                 setModeSuggestParameters(mode.key, mode.suggestParameters)
             }
         }
+        // 启动时异步拉取远程管理员列表
+        RemoteAdminList.refresh()
         lamp = BukkitLamp.builder(this)
             .permissionFactory(PluginCommandPermissionFactory())
             .annotationReplacer(Select::class.java, SelectReplacer())
